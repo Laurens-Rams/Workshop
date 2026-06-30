@@ -6,243 +6,231 @@
 <title>Pain Checker</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-
 :root {
-  --bg: #faf9f6;
-  --card: #ffffff;
-  --text: #1a1a1a;
-  --muted: #777;
-  --accent: #e8593a;
-  --accent-dark: #c4452a;
-  --green: #3aad6e;
-  --radius: 18px;
+  --bg: #faf9f6; --card: #fff; --text: #1a1a1a; --muted: #777;
+  --accent: #e8593a; --accent-dark: #c4452a; --green: #3aad6e;
+  --period: #e84393; --radius: 18px;
 }
-
 body {
-  background: var(--bg);
-  color: var(--text);
+  background: var(--bg); color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px 16px 60px;
+  min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; padding: 20px 16px 80px;
 }
-
-.screen {
-  display: none;
-  width: 100%;
-  max-width: 480px;
-  flex-direction: column;
-  align-items: center;
-  gap: 18px;
-}
-.screen.active {
-  display: flex;
-  animation: fadeIn 0.25s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+.screen { display: none; width: 100%; max-width: 480px; flex-direction: column; align-items: center; gap: 16px; }
+.screen.active { display: flex; animation: fadeIn 0.25s ease; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 
 h1 { font-size: 2rem; line-height: 1.25; text-align: center; font-weight: 800; }
-h2 { font-size: 1.7rem; line-height: 1.3; text-align: center; font-weight: 700; }
-.subtitle { font-size: 1.15rem; color: var(--muted); text-align: center; line-height: 1.5; }
+h2 { font-size: 1.65rem; line-height: 1.3; text-align: center; font-weight: 700; }
+.subtitle { font-size: 1.1rem; color: var(--muted); text-align: center; line-height: 1.5; }
 
 /* Buttons */
-.btn {
-  display: block; width: 100%;
-  padding: 20px; font-size: 1.3rem; font-weight: 700;
-  border: none; border-radius: var(--radius);
-  cursor: pointer; text-align: center;
-  background: var(--accent); color: white;
-  transition: background 0.15s, transform 0.1s;
-  -webkit-tap-highlight-color: transparent;
-}
-.btn:active { transform: scale(0.97); background: var(--accent-dark); }
+.btn { display: block; width: 100%; padding: 20px; font-size: 1.25rem; font-weight: 700;
+  border: none; border-radius: var(--radius); cursor: pointer; text-align: center;
+  background: var(--accent); color: white; transition: background .15s, transform .1s;
+  -webkit-tap-highlight-color: transparent; }
+.btn:active { transform: scale(.97); background: var(--accent-dark); }
 .btn.secondary { background: #ebe8e2; color: var(--text); }
 .btn.secondary:active { background: #d9d5ce; }
-.btn.green { background: var(--green); }
+.btn.green { background: var(--green); color: white; }
 .btn.green:active { background: #2d9159; }
 .btn.outline { background: transparent; color: var(--accent); border: 2.5px solid var(--accent); }
+.back-btn { align-self: flex-start; background: none; border: none; color: var(--muted); font-size: 1rem; cursor: pointer; padding: 4px 0; }
 
-/* Back button */
-.back-btn {
-  align-self: flex-start;
-  background: none; border: none;
-  color: var(--muted); font-size: 1rem;
-  cursor: pointer; padding: 4px 0;
-}
-
-/* Progress dots */
+/* Progress */
 .progress { display: flex; gap: 8px; }
-.progress-dot {
-  width: 9px; height: 9px; border-radius: 50%;
-  background: #ddd; transition: background 0.2s;
-}
+.progress-dot { width: 9px; height: 9px; border-radius: 50%; background: #ddd; transition: background .2s; }
 .progress-dot.done { background: var(--accent); }
 
 /* Emoji row */
 .emoji-row { display: flex; gap: 10px; width: 100%; }
-.emoji-btn {
-  flex: 1; padding: 22px 8px;
-  border: 3px solid #e5e2dc; border-radius: var(--radius);
-  background: white; cursor: pointer;
-  display: flex; flex-direction: column; align-items: center; gap: 10px;
-  font-size: 2.2rem;
-  transition: border-color 0.15s, transform 0.1s;
-  -webkit-tap-highlight-color: transparent;
-}
+.emoji-btn { flex: 1; padding: 20px 8px; border: 3px solid #e5e2dc; border-radius: var(--radius);
+  background: white; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 10px;
+  font-size: 2.2rem; transition: border-color .15s, transform .1s; -webkit-tap-highlight-color: transparent; }
 .emoji-btn .label { font-size: 1rem; font-weight: 700; color: var(--text); }
 .emoji-btn.selected { border-color: var(--accent); background: #fff3f0; }
-.emoji-btn:active { transform: scale(0.95); }
+.emoji-btn:active { transform: scale(.95); }
+
+/* Screen title row with info */
+.screen-title-row { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; }
+.info-btn { background: none; border: 2px solid #ddd; border-radius: 50%; width: 32px; height: 32px;
+  font-size: 0.9rem; cursor: pointer; color: var(--muted); flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.info-btn:active { background: #f0ede8; }
 
 /* Body map */
-.body-map-wrap {
-  position: relative;
-  width: 180px; height: 300px;
-  cursor: crosshair;
-  touch-action: none;
-  user-select: none;
-}
+.body-map-wrap { position: relative; width: 180px; height: 300px; cursor: crosshair; touch-action: none; user-select: none; }
 .body-map-wrap svg { width: 100%; height: 100%; }
-.pain-dot {
-  position: absolute;
-  width: 24px; height: 24px;
-  background: var(--accent);
-  border-radius: 50%;
-  border: 3px solid white;
-  box-shadow: 0 2px 10px rgba(232,89,58,0.5);
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  animation: popIn 0.2s ease;
-}
-@keyframes popIn {
-  from { transform: translate(-50%,-50%) scale(0); }
-  to   { transform: translate(-50%,-50%) scale(1); }
-}
+.pain-dot { position: absolute; width: 24px; height: 24px; background: var(--accent); border-radius: 50%;
+  border: 3px solid white; box-shadow: 0 2px 10px rgba(232,89,58,.5);
+  transform: translate(-50%,-50%); pointer-events: none; animation: popIn .2s ease; }
+@keyframes popIn { from { transform: translate(-50%,-50%) scale(0); } to { transform: translate(-50%,-50%) scale(1); } }
 
-/* Pain type grid */
+/* Option buttons (pain start, recent pain) */
+.option-list { display: flex; flex-direction: column; gap: 10px; width: 100%; }
+.option-btn { width: 100%; padding: 18px 20px; font-size: 1.15rem; font-weight: 600;
+  border: 3px solid #e5e2dc; border-radius: var(--radius); background: white; cursor: pointer; text-align: left;
+  transition: border-color .15s; -webkit-tap-highlight-color: transparent; }
+.option-btn.selected { border-color: var(--accent); background: #fff3f0; }
+.option-btn:active { transform: scale(.98); }
+
+/* Pain types */
 .pain-types { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
-.pain-type-btn {
-  padding: 18px 8px;
-  border: 3px solid #e5e2dc; border-radius: var(--radius);
-  background: white; font-size: 1.05rem; font-weight: 700;
-  cursor: pointer;
+.pain-type-btn { padding: 16px 8px; border: 3px solid #e5e2dc; border-radius: var(--radius);
+  background: white; font-size: 1rem; font-weight: 700; cursor: pointer;
   display: flex; flex-direction: column; align-items: center; gap: 8px;
-  transition: border-color 0.15s;
-  -webkit-tap-highlight-color: transparent;
-}
-.pain-type-btn .icon { font-size: 1.9rem; }
+  -webkit-tap-highlight-color: transparent; transition: border-color .15s; }
+.pain-type-btn .icon { font-size: 1.8rem; }
 .pain-type-btn.selected { border-color: var(--accent); background: #fff3f0; }
-.pain-type-btn:active { transform: scale(0.96); }
+.pain-type-btn:active { transform: scale(.96); }
 
 /* Pain circle + slider */
 .pain-circle-wrap { display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%; }
-.pain-circle {
-  width: 170px; height: 170px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  background: #a8d8ea;
-  transition: background 0.25s, box-shadow 0.25s;
-  box-shadow: 0 6px 24px rgba(0,0,0,0.15);
-}
-.pain-circle-num { font-size: 3.5rem; font-weight: 900; color: white; text-shadow: 0 2px 8px rgba(0,0,0,0.25); }
-.pain-slider {
-  width: 100%; height: 10px;
-  -webkit-appearance: none; border-radius: 10px;
-  background: linear-gradient(to right, #a8d8ea, #ffb347, #ff2d2d);
-  outline: none; cursor: pointer;
-}
-.pain-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 40px; height: 40px; border-radius: 50%;
-  background: white; border: 3px solid #ccc;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-  cursor: pointer;
-}
+.pain-circle { width: 170px; height: 170px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: #a8d8ea; transition: background .25s, box-shadow .25s; box-shadow: 0 6px 24px rgba(0,0,0,.12); }
+.pain-circle-num { font-size: 3.5rem; font-weight: 900; color: white; text-shadow: 0 2px 8px rgba(0,0,0,.25); }
+.pain-slider { width: 100%; height: 10px; -webkit-appearance: none; border-radius: 10px;
+  background: linear-gradient(to right, #a8d8ea, #ffb347, #ff2d2d); outline: none; cursor: pointer; }
+.pain-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 40px; height: 40px; border-radius: 50%;
+  background: white; border: 3px solid #ccc; box-shadow: 0 2px 10px rgba(0,0,0,.2); cursor: pointer; }
 .pain-labels { display: flex; justify-content: space-between; width: 100%; }
-.pain-labels span { font-size: 0.95rem; color: var(--muted); }
-
-.sound-toggle {
-  background: none; border: 2px solid #ddd;
-  border-radius: 30px; padding: 12px 22px;
-  font-size: 1rem; cursor: pointer; color: var(--muted);
-  display: flex; align-items: center; gap: 8px;
-  transition: border-color 0.15s, color 0.15s;
-}
+.pain-labels span { font-size: .95rem; color: var(--muted); }
+.sound-toggle { background: none; border: 2px solid #ddd; border-radius: 30px; padding: 12px 22px;
+  font-size: 1rem; cursor: pointer; color: var(--muted); display: flex; align-items: center; gap: 8px; transition: border-color .15s, color .15s; }
 .sound-toggle.on { border-color: var(--accent); color: var(--accent); }
 
-/* Medication */
-.med-textarea {
-  width: 100%; font-size: 1.15rem; font-family: inherit;
-  padding: 18px; border: 2.5px solid #e5e2dc;
-  border-radius: var(--radius); background: white; outline: none;
-  resize: none; line-height: 1.5;
-}
+/* Medication pills */
+.med-pills { display: flex; flex-wrap: wrap; gap: 10px; width: 100%; }
+.med-pill { padding: 14px 18px; border: 2.5px solid #e5e2dc; border-radius: 30px; background: white;
+  font-size: 1.05rem; font-weight: 600; cursor: pointer; transition: border-color .15s;
+  -webkit-tap-highlight-color: transparent; }
+.med-pill.selected { border-color: var(--accent); background: #fff3f0; color: var(--accent); }
+.med-pill:active { transform: scale(.96); }
+.med-other-wrap { width: 100%; display: none; }
+.med-textarea { width: 100%; font-size: 1.1rem; font-family: inherit; padding: 16px; border: 2.5px solid #e5e2dc;
+  border-radius: var(--radius); background: white; outline: none; resize: none; line-height: 1.5; }
 .med-textarea:focus { border-color: var(--accent); }
 
-/* Summary */
-.summary-card {
-  width: 100%; background: white;
-  border-radius: var(--radius); padding: 24px;
-  font-size: 1.15rem; line-height: 1.8;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
-}
+/* Summary tabs */
+.tabs { display: flex; width: 100%; border-radius: var(--radius); background: #ebe8e2; padding: 5px; gap: 4px; }
+.tab-btn { flex: 1; padding: 14px; border: none; border-radius: 14px; font-size: 1.05rem; font-weight: 700;
+  cursor: pointer; background: transparent; color: var(--muted); transition: background .15s, color .15s; }
+.tab-btn.active { background: white; color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,.1); }
+
+/* Summary cards */
+.summary-card { width: 100%; background: white; border-radius: var(--radius); padding: 22px;
+  font-size: 1.1rem; line-height: 1.8; box-shadow: 0 2px 16px rgba(0,0,0,.07); }
 .summary-card strong { color: var(--accent); }
 
-/* Read aloud button */
-.read-btn {
-  background: none; border: 2px solid #ddd;
-  border-radius: 30px; padding: 12px 22px;
-  font-size: 1rem; cursor: pointer; color: var(--muted);
-  display: flex; align-items: center; gap: 8px;
-}
-.read-btn:active { background: #f0ede8; }
+/* Doctor view */
+.doctor-card { width: 100%; background: white; border-radius: var(--radius); padding: 22px;
+  box-shadow: 0 2px 16px rgba(0,0,0,.07); display: flex; flex-direction: column; gap: 16px; }
+.dr-level { display: flex; align-items: center; gap: 16px; }
+.dr-circle { width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 2rem; font-weight: 900; color: white; flex-shrink: 0; }
+.dr-level-info h3 { font-size: 1.5rem; font-weight: 800; }
+.dr-level-info .vs-baseline { font-size: 1rem; color: var(--muted); }
+.dr-rows { display: flex; flex-direction: column; gap: 10px; }
+.dr-row { display: flex; gap: 12px; align-items: flex-start; font-size: 1.05rem; }
+.dr-row .label { color: var(--muted); font-weight: 600; min-width: 90px; flex-shrink: 0; }
+.dr-row .value { font-weight: 700; }
+.dr-mini-graph { width: 100%; }
+.dr-mini-graph h4 { font-size: 1rem; color: var(--muted); margin-bottom: 8px; }
 
-/* History */
+/* Graph */
+.graph-wrap { width: 100%; background: white; border-radius: var(--radius); padding: 20px;
+  box-shadow: 0 2px 16px rgba(0,0,0,.07); }
+.graph-wrap h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 14px; }
+.graph-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 12px; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: .9rem; color: var(--muted); }
+.legend-dot { width: 12px; height: 12px; border-radius: 50%; }
+
+/* History items */
 .history-list { width: 100%; display: flex; flex-direction: column; gap: 10px; }
-.history-item {
-  background: white; border-radius: 14px; padding: 16px 18px;
-  display: flex; align-items: center; gap: 16px;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.07);
-}
-.history-circle {
-  width: 52px; height: 52px; border-radius: 50%; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.4rem; font-weight: 900; color: white;
-}
-.history-info { flex: 1; }
-.history-info .date { font-size: 0.9rem; color: var(--muted); }
-.history-info .level { font-size: 1.15rem; font-weight: 700; }
-.history-info .types { font-size: 0.95rem; color: var(--muted); }
+.history-item { background: white; border-radius: 14px; padding: 14px 16px;
+  display: flex; align-items: center; gap: 14px; box-shadow: 0 1px 6px rgba(0,0,0,.06); }
+.history-circle { width: 50px; height: 50px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 900; color: white; }
+.history-info .date { font-size: .9rem; color: var(--muted); }
+.history-info .level { font-size: 1.1rem; font-weight: 700; }
+.history-info .types { font-size: .9rem; color: var(--muted); }
+.mock-tag { font-size: .75rem; background: #f0ede8; color: var(--muted); padding: 2px 8px; border-radius: 8px; }
+
+/* Read aloud */
+.read-btn { background: none; border: 2px solid #ddd; border-radius: 30px; padding: 12px 22px;
+  font-size: 1rem; cursor: pointer; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.read-btn:active { background: #f0ede8; }
+.read-btn.big { font-size: 1.1rem; padding: 16px 26px; border-radius: var(--radius);
+  align-self: stretch; justify-content: center; }
+
+/* Info modal */
+.modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 100;
+  align-items: flex-end; justify-content: center; padding: 20px; }
+.modal-bg.open { display: flex; animation: fadeIn .2s ease; }
+.modal-box { background: white; border-radius: 24px 24px 24px 24px; padding: 28px; max-width: 480px;
+  width: 100%; font-size: 1.1rem; line-height: 1.65; }
+.modal-box h3 { font-size: 1.3rem; font-weight: 800; margin-bottom: 12px; }
+.modal-close { display: block; width: 100%; margin-top: 20px; padding: 16px; border: none;
+  border-radius: var(--radius); background: #ebe8e2; font-size: 1.1rem; font-weight: 700; cursor: pointer; }
+
+/* Period legend */
+.period-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--period); }
 
 /* App header */
 .app-logo { font-size: 3rem; }
 .app-name { font-size: 2.2rem; font-weight: 900; }
-.app-tagline { font-size: 1.15rem; color: var(--muted); text-align: center; }
+.app-tagline { font-size: 1.1rem; color: var(--muted); text-align: center; }
 </style>
 </head>
 <body>
 
+<!-- Info modal -->
+<div class="modal-bg" id="info-modal" onclick="closeInfo(event)">
+  <div class="modal-box">
+    <h3 id="modal-title"></h3>
+    <div id="modal-body"></div>
+    <button class="modal-close" onclick="closeModal()">Got it</button>
+  </div>
+</div>
+
 <!-- ── WELCOME ── -->
 <div class="screen active" id="s-welcome">
-  <div style="height:20px"></div>
+  <div style="height:12px"></div>
   <div class="app-logo">🩺</div>
   <div class="app-name">Pain Checker</div>
   <div class="app-tagline">Help yourself explain how you feel</div>
   <div style="height:8px"></div>
-  <button class="btn" onclick="go('s-feeling')">Start a check-in</button>
+  <button class="btn" onclick="startCheckin()">Start a check-in</button>
   <button class="btn secondary" onclick="showHistory()">See past check-ins</button>
+  <button class="btn outline" onclick="go('s-baseline')">Set my baseline pain level</button>
   <button class="read-btn" onclick="speak('Pain Checker. Help yourself explain how you feel. Tap Start a check-in to begin.')">🔊 Read out loud</button>
 </div>
 
-<!-- ── HOW ARE YOU FEELING ── -->
+<!-- ── BASELINE ── -->
+<div class="screen" id="s-baseline">
+  <button class="back-btn" onclick="go('s-welcome')">← Back</button>
+  <div class="screen-title-row">
+    <h2>What is your normal pain level?</h2>
+    <button class="info-btn" onclick="showInfo('Your baseline','Your baseline is what your pain is like on a typical day — even without anything happening. Setting this helps the app show whether today\'s pain is better or worse than usual. You can change it any time.')">ℹ️</button>
+  </div>
+  <p class="subtitle">On a normal day, how much pain do you usually have?</p>
+  <div class="pain-circle-wrap">
+    <div class="pain-circle" id="baseline-circle"><span class="pain-circle-num" id="baseline-num">0</span></div>
+    <input type="range" min="0" max="10" value="0" class="pain-slider" id="baseline-slider" oninput="updateBaseline(this.value)">
+    <div class="pain-labels"><span>0 — No pain</span><span>10 — Worst pain</span></div>
+  </div>
+  <button class="btn green" onclick="saveBaseline()">Save my baseline</button>
+  <button class="read-btn" onclick="speak('What is your normal pain level? Move the slider to show how much pain you usually have on a normal day.')">🔊 Read out loud</button>
+</div>
+
+<!-- ── FEELING ── -->
 <div class="screen" id="s-feeling">
   <button class="back-btn" onclick="go('s-welcome')">← Back</button>
   <div class="progress" id="prog-feeling"></div>
-  <h1>How are you feeling right now?</h1>
+  <div class="screen-title-row">
+    <h1>How are you feeling right now?</h1>
+    <button class="info-btn" onclick="showInfo('How you\'re feeling','We ask this to understand if pain or discomfort is affecting your mood or energy today.')">ℹ️</button>
+  </div>
   <div class="emoji-row">
     <button class="emoji-btn" onclick="pickFeeling('good',this)">😊<span class="label">Good</span></button>
     <button class="emoji-btn" onclick="pickFeeling('ok',this)">😐<span class="label">OK</span></button>
@@ -251,7 +239,7 @@ h2 { font-size: 1.7rem; line-height: 1.3; text-align: center; font-weight: 700; 
   <button class="read-btn" onclick="speak('How are you feeling right now? Choose Good, OK, or Not great.')">🔊 Read out loud</button>
 </div>
 
-<!-- ── DO YOU HAVE PAIN ── -->
+<!-- ── HAS PAIN ── -->
 <div class="screen" id="s-haspain">
   <button class="back-btn" onclick="go('s-feeling')">← Back</button>
   <div class="progress" id="prog-haspain"></div>
@@ -261,59 +249,80 @@ h2 { font-size: 1.7rem; line-height: 1.3; text-align: center; font-weight: 700; 
   <button class="read-btn" onclick="speak('Do you have any pain right now?')">🔊 Read out loud</button>
 </div>
 
+<!-- ── NO PAIN RECENTLY ── -->
+<div class="screen" id="s-nopain-recent">
+  <button class="back-btn" onclick="go('s-haspain')">← Back</button>
+  <div class="progress" id="prog-nopain-recent"></div>
+  <h2>Did you have any pain in the last two weeks?</h2>
+  <div class="option-list">
+    <button class="option-btn" onclick="pickRecentPain('yes-recent', this)">Yes, I had pain recently</button>
+    <button class="option-btn" onclick="pickRecentPain('no-recent', this)">No, no pain for a while</button>
+  </div>
+  <button class="read-btn" onclick="speak('Did you have any pain in the last two weeks?')">🔊 Read out loud</button>
+</div>
+
 <!-- ── BODY MAP ── -->
 <div class="screen" id="s-bodymap">
   <button class="back-btn" onclick="go('s-haspain')">← Back</button>
   <div class="progress" id="prog-bodymap"></div>
-  <h2>Tap where it hurts</h2>
+  <div class="screen-title-row">
+    <h2>Tap where it hurts</h2>
+    <button class="info-btn" onclick="showInfo('Where does it hurt?','Showing where the pain is helps your doctor know exactly where to look and understand what might be causing it. You can tap more than one place.')">ℹ️</button>
+  </div>
   <p class="subtitle">You can tap more than one place</p>
-  <div class="body-map-wrap" id="body-map"
-       ontouchstart="bodyTap(event)" onclick="bodyTap(event)">
+  <div class="body-map-wrap" id="body-map" ontouchstart="bodyTap(event)" onclick="bodyTap(event)">
     <svg viewBox="0 0 200 320" xmlns="http://www.w3.org/2000/svg">
-      <!-- Head -->
       <ellipse cx="100" cy="38" rx="28" ry="32" fill="#ddd4c8" stroke="#c5bcb2" stroke-width="2"/>
-      <!-- Neck -->
       <rect x="90" y="68" width="20" height="14" rx="4" fill="#ddd4c8" stroke="#c5bcb2" stroke-width="2"/>
-      <!-- Torso -->
       <rect x="62" y="81" width="76" height="92" rx="14" fill="#ddd4c8" stroke="#c5bcb2" stroke-width="2"/>
-      <!-- Left upper arm -->
       <rect x="36" y="83" width="24" height="60" rx="12" fill="#ddd4c8" stroke="#c5bcb2" stroke-width="2"/>
-      <!-- Right upper arm -->
       <rect x="140" y="83" width="24" height="60" rx="12" fill="#ddd4c8" stroke="#c5bcb2" stroke-width="2"/>
-      <!-- Left forearm -->
       <rect x="38" y="144" width="20" height="52" rx="10" fill="#ddd4c8" stroke="#c5bcb2" stroke-width="2"/>
-      <!-- Right forearm -->
       <rect x="142" y="144" width="20" height="52" rx="10" fill="#ddd4c8" stroke="#c5bcb2" stroke-width="2"/>
-      <!-- Left hand -->
       <ellipse cx="48" cy="204" rx="12" ry="14" fill="#ddd4c8" stroke="#c5bcb2" stroke-width="2"/>
-      <!-- Right hand -->
       <ellipse cx="152" cy="204" rx="12" ry="14" fill="#ddd4c8" stroke="#c5bcb2" stroke-width="2"/>
-      <!-- Left leg -->
       <rect x="66" y="172" width="30" height="88" rx="13" fill="#ddd4c8" stroke="#c5bcb2" stroke-width="2"/>
-      <!-- Right leg -->
       <rect x="104" y="172" width="30" height="88" rx="13" fill="#ddd4c8" stroke="#c5bcb2" stroke-width="2"/>
-      <!-- Left foot -->
       <ellipse cx="81" cy="266" rx="16" ry="11" fill="#ddd4c8" stroke="#c5bcb2" stroke-width="2"/>
-      <!-- Right foot -->
       <ellipse cx="119" cy="266" rx="16" ry="11" fill="#ddd4c8" stroke="#c5bcb2" stroke-width="2"/>
-      <!-- Eyes -->
       <circle cx="91" cy="34" r="3" fill="#b0a898"/>
       <circle cx="109" cy="34" r="3" fill="#b0a898"/>
-      <!-- Smile -->
       <path d="M93 46 Q100 52 107 46" fill="none" stroke="#b0a898" stroke-width="2" stroke-linecap="round"/>
     </svg>
   </div>
-  <button class="btn" onclick="go('s-paintype')">Next →</button>
-  <button class="btn outline" onclick="clearDots()" style="font-size:1.1rem; padding:16px;">Clear all</button>
-  <button class="read-btn" onclick="speak('Tap on the body to show where you feel pain. You can tap more than one place. Then tap Next.')">🔊 Read out loud</button>
+  <button class="btn" onclick="go('s-painstart')">Next →</button>
+  <button class="btn outline" onclick="clearDots()" style="font-size:1.1rem;padding:16px;">Clear all dots</button>
+  <button class="read-btn" onclick="speak('Tap on the body picture to show where your pain is. You can tap more than one place. Then tap Next.')">🔊 Read out loud</button>
+</div>
+
+<!-- ── WHEN DID IT START ── -->
+<div class="screen" id="s-painstart">
+  <button class="back-btn" onclick="go('s-bodymap')">← Back</button>
+  <div class="progress" id="prog-painstart"></div>
+  <div class="screen-title-row">
+    <h2>When did the pain start?</h2>
+    <button class="info-btn" onclick="showInfo('When did it start?','Knowing how long you\'ve had the pain helps your doctor understand whether it\'s a new problem or something that\'s been going on for a while.')">ℹ️</button>
+  </div>
+  <div class="option-list" id="painstart-options">
+    <button class="option-btn" onclick="pickStart('Today',this)">Today</button>
+    <button class="option-btn" onclick="pickStart('Yesterday',this)">Yesterday</button>
+    <button class="option-btn" onclick="pickStart('A few days ago',this)">A few days ago</button>
+    <button class="option-btn" onclick="pickStart('About a week ago',this)">About a week ago</button>
+    <button class="option-btn" onclick="pickStart('A few weeks ago',this)">A few weeks ago</button>
+    <button class="option-btn" onclick="pickStart('It\'s been a long time',this)">It's been a long time</button>
+  </div>
+  <button class="read-btn" onclick="speak('When did the pain start? Choose the option that feels right.')">🔊 Read out loud</button>
 </div>
 
 <!-- ── PAIN TYPE ── -->
 <div class="screen" id="s-paintype">
-  <button class="back-btn" onclick="go('s-bodymap')">← Back</button>
+  <button class="back-btn" onclick="go('s-painstart')">← Back</button>
   <div class="progress" id="prog-paintype"></div>
-  <h2>What does your pain feel like?</h2>
-  <p class="subtitle">Pick as many as you like</p>
+  <div class="screen-title-row">
+    <h2>What does it feel like?</h2>
+    <button class="info-btn" onclick="showInfo('What the pain feels like','Describing what the pain feels like helps doctors understand what kind of pain it is. Different types of pain have different causes and treatments.')">ℹ️</button>
+  </div>
+  <p class="subtitle">Pick as many as feel right</p>
   <div class="pain-types">
     <button class="pain-type-btn" onclick="toggleType('Sharp',this)"><span class="icon">⚡</span>Sharp</button>
     <button class="pain-type-btn" onclick="toggleType('Dull',this)"><span class="icon">🌑</span>Dull</button>
@@ -332,155 +341,202 @@ h2 { font-size: 1.7rem; line-height: 1.3; text-align: center; font-weight: 700; 
 <div class="screen" id="s-painlevel">
   <button class="back-btn" onclick="go('s-paintype')">← Back</button>
   <div class="progress" id="prog-painlevel"></div>
-  <h2>How bad is the pain?</h2>
+  <div class="screen-title-row">
+    <h2>How bad is it right now?</h2>
+    <button class="info-btn" onclick="showInfo('Pain level','This number helps your doctor understand how much the pain is affecting you. 0 means no pain at all. 10 is the worst pain you can imagine. Most everyday pain sits between 3 and 6.')">ℹ️</button>
+  </div>
   <div class="pain-circle-wrap">
-    <div class="pain-circle" id="pain-circle">
-      <span class="pain-circle-num" id="pain-num">0</span>
-    </div>
-    <input type="range" min="0" max="10" value="0" class="pain-slider" id="pain-slider"
-           oninput="updatePain(this.value)" onchange="updatePain(this.value)">
-    <div class="pain-labels">
-      <span>0 — No pain</span>
-      <span>10 — Worst pain</span>
-    </div>
+    <div class="pain-circle" id="pain-circle"><span class="pain-circle-num" id="pain-num">0</span></div>
+    <input type="range" min="0" max="10" value="0" class="pain-slider" id="pain-slider" oninput="updatePain(this.value)">
+    <div class="pain-labels"><span>0 — No pain</span><span>10 — Worst pain</span></div>
     <button class="sound-toggle" id="sound-btn" onclick="toggleSound()">🔇 Sound off</button>
   </div>
   <button class="btn" onclick="go('s-medication')">Next →</button>
-  <button class="read-btn" onclick="speak('Move the slider to show how bad your pain is. 0 means no pain. 10 means the worst pain you can imagine.')">🔊 Read out loud</button>
+  <button class="read-btn" onclick="speak('Move the slider to show how bad your pain is right now. 0 means no pain at all. 10 means the worst pain you can imagine.')">🔊 Read out loud</button>
 </div>
 
 <!-- ── MEDICATION ── -->
 <div class="screen" id="s-medication">
   <button class="back-btn" onclick="go('s-painlevel')">← Back</button>
   <div class="progress" id="prog-medication"></div>
-  <h2>Did you take anything for the pain?</h2>
-  <p class="subtitle">Like medicine, tablets, or anything else</p>
-  <button class="btn" id="med-yes" onclick="showMedBox()">Yes</button>
-  <button class="btn secondary" id="med-no" onclick="skipMed()">No, nothing</button>
-  <div id="med-box" style="display:none; width:100%; display:none;">
-    <textarea class="med-textarea" id="med-text" rows="3" placeholder="e.g. Paracetamol, ibuprofen…"></textarea>
-    <div style="height:8px"></div>
-    <button class="btn green" onclick="saveMed()">Done →</button>
+  <div class="screen-title-row">
+    <h2>Did you take anything for the pain?</h2>
+    <button class="info-btn" onclick="showInfo('Medication','Telling your doctor what you\'ve taken helps them understand your pain and decide what else might help. It also makes sure they don\'t give you something that doesn\'t mix well.')">ℹ️</button>
   </div>
-  <button class="read-btn" onclick="speak('Did you take any medicine or tablets for the pain?')">🔊 Read out loud</button>
+  <div class="med-pills" id="med-pills">
+    <button class="med-pill" onclick="toggleMed('Paracetamol',this)">Paracetamol</button>
+    <button class="med-pill" onclick="toggleMed('Ibuprofen',this)">Ibuprofen</button>
+    <button class="med-pill" onclick="toggleMed('Aspirin',this)">Aspirin</button>
+    <button class="med-pill" onclick="toggleMed('Codeine',this)">Codeine</button>
+    <button class="med-pill" onclick="toggleMed('Naproxen',this)">Naproxen</button>
+    <button class="med-pill" onclick="toggleMed('Amitriptyline',this)">Amitriptyline</button>
+    <button class="med-pill" onclick="toggleMed('Pregabalin',this)">Pregabalin</button>
+    <button class="med-pill" onclick="toggleMed('Tramadol',this)">Tramadol</button>
+    <button class="med-pill" onclick="toggleMed('Morphine',this)">Morphine</button>
+    <button class="med-pill" onclick="toggleMed('CBD',this)">CBD</button>
+    <button class="med-pill" onclick="toggleMed('Heat pad',this)">Heat pad</button>
+    <button class="med-pill" onclick="toggleMed('Ice pack',this)">Ice pack</button>
+    <button class="med-pill" onclick="toggleOtherMed(this)">✏️ Other…</button>
+  </div>
+  <div class="med-other-wrap" id="med-other-wrap">
+    <textarea class="med-textarea" id="med-other-text" rows="2" placeholder="Type what you took…"></textarea>
+  </div>
+  <button class="btn green" onclick="go('s-summary')">Done →</button>
+  <button class="read-btn" onclick="speak('Did you take anything for the pain? Tap everything that applies, then tap Done.')">🔊 Read out loud</button>
 </div>
 
 <!-- ── SUMMARY ── -->
 <div class="screen" id="s-summary">
   <button class="back-btn" onclick="go('s-medication')">← Back</button>
-  <h2>Here's what you can tell your doctor</h2>
-  <div class="summary-card" id="summary-card"></div>
-  <button class="read-btn" onclick="readSummary()" style="font-size:1.1rem; padding:16px 26px; align-self:stretch; justify-content:center; border-radius:var(--radius);">
-    🔊 Read it all out loud
-  </button>
-  <button class="btn green" onclick="saveCheckin()">Save this check-in</button>
-  <button class="btn secondary" onclick="startOver()">Start a new check-in</button>
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-me" onclick="switchTab('me')">My view</button>
+    <button class="tab-btn" id="tab-dr" onclick="switchTab('doctor')">Doctor view</button>
+  </div>
+
+  <!-- My view -->
+  <div id="view-me" style="width:100%;display:flex;flex-direction:column;gap:16px;align-items:center;">
+    <div class="summary-card" id="summary-card"></div>
+    <button class="read-btn big" onclick="readSummary()">🔊 Read it all out loud</button>
+    <button class="btn green" onclick="saveCheckin()">Save this check-in</button>
+    <button class="btn secondary" onclick="startOver()">Start a new check-in</button>
+  </div>
+
+  <!-- Doctor view -->
+  <div id="view-doctor" style="width:100%;display:none;flex-direction:column;gap:16px;align-items:center;">
+    <div class="doctor-card" id="doctor-card"></div>
+    <button class="read-btn big" onclick="readDoctorView()">🔊 Read out loud</button>
+    <button class="btn green" onclick="saveCheckin()">Save this check-in</button>
+    <button class="btn secondary" onclick="startOver()">Start a new check-in</button>
+  </div>
 </div>
 
 <!-- ── HISTORY ── -->
 <div class="screen" id="s-history">
   <button class="back-btn" onclick="go('s-welcome')">← Back</button>
-  <h2>Your past check-ins</h2>
+  <h2>Pain over time</h2>
+  <div class="graph-wrap" id="graph-wrap">
+    <h3>Last 28 days</h3>
+    <div id="graph-svg"></div>
+    <div class="graph-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#a8d8ea"></div>Low pain</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#ff6600"></div>High pain</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--period)"></div>Period days (mocked)</div>
+      <div class="legend-item" id="baseline-legend" style="display:none">
+        <div style="width:20px;height:2px;border-top:2px dashed var(--accent)"></div>Your baseline
+      </div>
+    </div>
+  </div>
   <div class="history-list" id="history-list"></div>
+  <p class="subtitle" style="font-size:.9rem">Faded bars = demo data to show how it looks over time</p>
   <button class="btn secondary" onclick="go('s-welcome')">Back to start</button>
 </div>
 
 <script>
-// ── State ──
+// ── STATE ──
 const S = {
-  feeling: null,
-  hasPain: true,
-  dots: [],
-  types: [],
-  level: 0,
-  med: '',
+  feeling: null, hasPain: true, recentPain: null,
+  dots: [], painStart: null, types: [], level: 0, meds: [], medOther: '',
   soundOn: false
 };
 
-// ── Audio ──
+// ── AUDIO ──
 let actx, osc, gain;
-
 function initAudio() {
   if (actx) return;
   actx = new (window.AudioContext || window.webkitAudioContext)();
-  gain = actx.createGain();
-  gain.connect(actx.destination);
-  gain.gain.value = 0;
-  osc = actx.createOscillator();
-  osc.type = 'sine';
-  osc.connect(gain);
-  osc.start();
+  gain = actx.createGain(); gain.connect(actx.destination); gain.gain.value = 0;
+  osc = actx.createOscillator(); osc.type = 'sine'; osc.connect(gain); osc.start();
 }
-
 function toggleSound() {
   S.soundOn = !S.soundOn;
   const btn = document.getElementById('sound-btn');
   if (S.soundOn) {
-    btn.textContent = '🔊 Sound on';
-    btn.classList.add('on');
-    initAudio();
-    applySound(S.level);
+    btn.textContent = '🔊 Sound on'; btn.classList.add('on');
+    initAudio(); applySound(S.level);
   } else {
-    btn.textContent = '🔇 Sound off';
-    btn.classList.remove('on');
+    btn.textContent = '🔇 Sound off'; btn.classList.remove('on');
     if (gain) gain.gain.value = 0;
   }
 }
-
-function applySound(level) {
+function applySound(v) {
   if (!S.soundOn || !gain) return;
-  gain.gain.value = level === 0 ? 0 : 0.04 + (level / 10) * 0.28;
-  if (osc) osc.frequency.value = 90 + (level / 10) * 320;
+  gain.gain.value = v === 0 ? 0 : 0.04 + (v/10)*0.28;
+  if (osc) osc.frequency.value = 90 + (v/10)*320;
 }
 
-// ── Pain colour ──
-function painColor(level) {
-  if (level === 0) return '#a8d8ea';
-  if (level <= 5) {
-    const t = level / 5;
-    return `rgb(${Math.round(168 + 87*t)}, ${Math.round(216 - 96*t)}, ${Math.round(234 - 234*t)})`;
+// ── COLOURS ──
+function painColor(v) {
+  if (v === 0) return '#a8d8ea';
+  if (v <= 5) {
+    const t = v/5;
+    return `rgb(${Math.round(168+87*t)},${Math.round(216-96*t)},${Math.round(234-234*t)})`;
   }
-  const t = (level - 5) / 5;
-  return `rgb(255, ${Math.round(120 - 120*t)}, 0)`;
+  const t = (v-5)/5;
+  return `rgb(255,${Math.round(120-120*t)},0)`;
 }
 
-function updatePain(val) {
-  S.level = +val;
+// ── PAIN CIRCLE ──
+function updatePain(v) {
+  S.level = +v;
   const c = document.getElementById('pain-circle');
   c.style.background = painColor(S.level);
-  c.style.boxShadow = S.level > 0
-    ? `0 6px 30px ${painColor(S.level)}80`
-    : '0 6px 24px rgba(0,0,0,0.1)';
+  c.style.boxShadow = S.level > 0 ? `0 6px 30px ${painColor(S.level)}80` : '0 6px 24px rgba(0,0,0,.1)';
   document.getElementById('pain-num').textContent = S.level;
   applySound(S.level);
 }
 
-// ── Navigation ──
-const FLOW = ['s-feeling','s-haspain','s-bodymap','s-paintype','s-painlevel','s-medication','s-summary'];
+// ── BASELINE ──
+let baselineTemp = 0;
+function updateBaseline(v) {
+  baselineTemp = +v;
+  const c = document.getElementById('baseline-circle');
+  c.style.background = painColor(+v);
+  document.getElementById('baseline-num').textContent = v;
+}
+function saveBaseline() {
+  localStorage.setItem('pain-baseline', baselineTemp);
+  go('s-welcome');
+  alert('Baseline saved: ' + baselineTemp + '/10 ✅');
+}
+function getBaseline() { const b = localStorage.getItem('pain-baseline'); return b !== null ? +b : -1; }
+
+// ── NAVIGATION ──
+const FLOW = ['s-feeling','s-haspain','s-bodymap','s-painstart','s-paintype','s-painlevel','s-medication','s-summary'];
+const PROG_IDS = ['feeling','haspain','bodymap','painstart','paintype','painlevel','medication'];
 
 function go(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
   drawProgress(id);
-  if (id === 's-summary') buildSummary();
+  if (id === 's-summary') { buildSummary(); buildDoctorView(); switchTab('me'); }
+  if (id === 's-history') buildHistory();
 }
 
-function drawProgress(active) {
-  FLOW.forEach((id, i) => {
-    const el = document.getElementById('prog-' + id.replace('s-',''));
+function drawProgress(activeId) {
+  const activeIdx = FLOW.indexOf(activeId);
+  PROG_IDS.forEach((pid, i) => {
+    const el = document.getElementById('prog-' + pid);
     if (!el) return;
     el.innerHTML = '';
-    const activeIdx = FLOW.indexOf(active);
-    FLOW.slice(0, FLOW.length-1).forEach((_, j) => {
+    PROG_IDS.forEach((_, j) => {
       const d = document.createElement('div');
       d.className = 'progress-dot' + (j < activeIdx ? ' done' : '');
       el.appendChild(d);
     });
   });
+  // also handle nopain-recent
+  const nr = document.getElementById('prog-nopain-recent');
+  if (nr) { nr.innerHTML = ''; }
 }
 
-// ── Screen logic ──
+// ── SCREEN LOGIC ──
+function startCheckin() {
+  // Show baseline prompt first time
+  if (getBaseline() < 0) { go('s-baseline'); }
+  else { go('s-feeling'); }
+}
+
 function pickFeeling(val, btn) {
   S.feeling = val;
   document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('selected'));
@@ -491,7 +547,14 @@ function pickFeeling(val, btn) {
 function pickHasPain(val) {
   S.hasPain = val;
   if (val) { go('s-bodymap'); }
-  else { S.dots=[]; S.types=[]; S.level=0; S.med=''; go('s-summary'); }
+  else { go('s-nopain-recent'); }
+}
+
+function pickRecentPain(val, btn) {
+  S.recentPain = val;
+  document.querySelectorAll('#s-nopain-recent .option-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  setTimeout(() => { S.dots=[]; S.types=[]; S.level=0; S.meds=[]; S.medOther=''; S.painStart=null; go('s-summary'); }, 280);
 }
 
 function bodyTap(e) {
@@ -499,18 +562,14 @@ function bodyTap(e) {
   const map = document.getElementById('body-map');
   const rect = map.getBoundingClientRect();
   let cx, cy;
-  if (e.touches && e.touches.length) {
-    cx = e.touches[0].clientX; cy = e.touches[0].clientY;
-  } else {
-    cx = e.clientX; cy = e.clientY;
-  }
-  const x = ((cx - rect.left) / rect.width * 100);
-  const y = ((cy - rect.top) / rect.height * 100);
+  if (e.touches && e.touches.length) { cx = e.touches[0].clientX; cy = e.touches[0].clientY; }
+  else { cx = e.clientX; cy = e.clientY; }
+  const x = (cx - rect.left) / rect.width * 100;
+  const y = (cy - rect.top) / rect.height * 100;
   S.dots.push({x, y});
   const dot = document.createElement('div');
   dot.className = 'pain-dot';
-  dot.style.left = x + '%';
-  dot.style.top = y + '%';
+  dot.style.left = x + '%'; dot.style.top = y + '%';
   map.appendChild(dot);
 }
 
@@ -519,119 +578,304 @@ function clearDots() {
   document.querySelectorAll('.pain-dot').forEach(d => d.remove());
 }
 
+function pickStart(val, btn) {
+  S.painStart = val;
+  document.querySelectorAll('#painstart-options .option-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  setTimeout(() => go('s-paintype'), 280);
+}
+
 function toggleType(type, btn) {
   btn.classList.toggle('selected');
   const i = S.types.indexOf(type);
   if (i === -1) S.types.push(type); else S.types.splice(i, 1);
 }
 
-function showMedBox() {
-  document.getElementById('med-yes').style.display = 'none';
-  document.getElementById('med-no').style.display = 'none';
-  document.getElementById('med-box').style.display = 'block';
-  document.getElementById('med-text').focus();
+function toggleMed(med, btn) {
+  btn.classList.toggle('selected');
+  const i = S.meds.indexOf(med);
+  if (i === -1) S.meds.push(med); else S.meds.splice(i, 1);
 }
 
-function skipMed() {
-  S.med = '';
-  go('s-summary');
+function toggleOtherMed(btn) {
+  const wrap = document.getElementById('med-other-wrap');
+  const showing = wrap.style.display === 'block';
+  wrap.style.display = showing ? 'none' : 'block';
+  btn.classList.toggle('selected', !showing);
+  if (!showing) document.getElementById('med-other-text').focus();
 }
 
-function saveMed() {
-  S.med = document.getElementById('med-text').value.trim();
-  go('s-summary');
+// ── SUMMARY ──
+function allMeds() {
+  const other = (document.getElementById('med-other-text').value || '').trim();
+  return [...S.meds, ...(other ? [other] : [])];
 }
 
-// ── Summary ──
+function dotsToRegions(dots) {
+  const r = new Set();
+  dots.forEach(({x, y}) => {
+    if (y < 18) r.add('head');
+    else if (y < 28) r.add('neck / shoulders');
+    else if (y < 55) {
+      if (x < 30) r.add('left arm'); else if (x > 70) r.add('right arm'); else r.add('chest / upper back');
+    } else if (y < 65) {
+      if (x < 30) r.add('left forearm'); else if (x > 70) r.add('right forearm'); else r.add('abdomen / lower back');
+    } else if (y < 85) {
+      if (x < 45) r.add('left thigh'); else r.add('right thigh');
+    } else {
+      if (x < 45) r.add('left leg / foot'); else r.add('right leg / foot');
+    }
+  });
+  return Array.from(r);
+}
+
 function buildSummary() {
   const feelLabel = {good:'good 😊', ok:'OK 😐', bad:'not great 😣'};
+  const meds = allMeds();
   let lines = [];
   if (S.feeling) lines.push(`I'm feeling <strong>${feelLabel[S.feeling]}</strong> today.`);
   if (!S.hasPain) {
-    lines.push(`I don't have any pain right now.`);
+    if (S.recentPain === 'yes-recent') lines.push(`I don't have pain right now, but I had pain in the last two weeks.`);
+    else lines.push(`I don't have any pain right now.`);
   } else {
-    if (S.dots.length > 0)
-      lines.push(`I have pain in <strong>${S.dots.length === 1 ? '1 place' : S.dots.length + ' places'}</strong> on my body.`);
-    if (S.types.length > 0)
-      lines.push(`The pain feels <strong>${S.types.join(', ')}</strong>.`);
+    const regions = dotsToRegions(S.dots);
+    if (regions.length) lines.push(`I have pain in my <strong>${regions.join(', ')}</strong>.`);
+    else if (S.dots.length) lines.push(`I have pain in <strong>${S.dots.length} place${S.dots.length > 1 ? 's' : ''}</strong> on my body.`);
+    if (S.painStart) lines.push(`It started <strong>${S.painStart.toLowerCase()}</strong>.`);
+    if (S.types.length) lines.push(`The pain feels <strong>${S.types.join(', ')}</strong>.`);
     lines.push(`My pain level is <strong>${S.level} out of 10</strong>.`);
-    if (S.med) lines.push(`I took <strong>${S.med}</strong> for the pain.`);
+    if (meds.length) lines.push(`I took <strong>${meds.join(', ')}</strong> for the pain.`);
     else lines.push(`I haven't taken anything for it.`);
   }
   document.getElementById('summary-card').innerHTML = lines.join('<br><br>');
 }
 
-function summaryPlainText() {
-  return document.getElementById('summary-card').innerText;
+function buildDoctorView() {
+  const meds = allMeds();
+  const regions = dotsToRegions(S.dots);
+  const baseline = getBaseline();
+  const col = S.hasPain ? painColor(S.level) : '#3aad6e';
+  const num = S.hasPain ? S.level : '✓';
+  let vsBaseline = '';
+  if (S.hasPain && baseline >= 0) {
+    const diff = S.level - baseline;
+    if (diff > 0) vsBaseline = `↑ ${diff} above baseline (${baseline}/10)`;
+    else if (diff < 0) vsBaseline = `↓ ${Math.abs(diff)} below baseline (${baseline}/10)`;
+    else vsBaseline = `= At baseline (${baseline}/10)`;
+  }
+
+  const feelLabel = {good:'Good 😊', ok:'OK 😐', bad:'Not great 😣', null:''};
+  const rows = [];
+  if (S.feeling) rows.push(['Mood today', feelLabel[S.feeling] || '']);
+  if (S.hasPain) {
+    if (regions.length) rows.push(['Location', regions.join(', ')]);
+    else if (S.dots.length) rows.push(['Location', `${S.dots.length} area${S.dots.length>1?'s':''} marked on body map`]);
+    if (S.painStart) rows.push(['Started', S.painStart]);
+    if (S.types.length) rows.push(['Character', S.types.join(', ')]);
+    rows.push(['Medication', meds.length ? meds.join(', ') : 'None taken']);
+  }
+
+  const rowsHtml = rows.map(([l,v]) => `<div class="dr-row"><span class="label">${l}</span><span class="value">${v}</span></div>`).join('');
+
+  // Mini graph (last 7 records)
+  const history = getHistory();
+  const recent7 = history.slice(0, 7).reverse();
+  const miniGraph = recent7.length >= 2 ? buildMiniGraph(recent7) : '';
+
+  document.getElementById('doctor-card').innerHTML = `
+    <div class="dr-level">
+      <div class="dr-circle" style="background:${col}">${num}</div>
+      <div class="dr-level-info">
+        <h3>${S.hasPain ? `Pain: ${S.level}/10` : 'No pain today'}</h3>
+        ${vsBaseline ? `<div class="vs-baseline">${vsBaseline}</div>` : ''}
+      </div>
+    </div>
+    ${rows.length ? `<div class="dr-rows">${rowsHtml}</div>` : ''}
+    ${miniGraph ? `<div class="dr-mini-graph"><h4>Last 7 check-ins</h4>${miniGraph}</div>` : ''}
+  `;
 }
 
-function readSummary() { speak(summaryPlainText()); }
+function readSummary() { speak(document.getElementById('summary-card').innerText); }
+function readDoctorView() { speak(document.getElementById('doctor-card').innerText); }
 
+function switchTab(tab) {
+  document.getElementById('tab-me').classList.toggle('active', tab === 'me');
+  document.getElementById('tab-dr').classList.toggle('active', tab === 'doctor');
+  document.getElementById('view-me').style.display = tab === 'me' ? 'flex' : 'none';
+  document.getElementById('view-doctor').style.display = tab === 'doctor' ? 'flex' : 'none';
+}
+
+// ── SAVE / RESET ──
 function saveCheckin() {
+  const meds = allMeds();
   const record = {
     date: new Date().toISOString(),
-    feeling: S.feeling,
-    hasPain: S.hasPain,
-    level: S.level,
-    types: [...S.types],
-    dots: [...S.dots],
-    med: S.med,
-    summary: summaryPlainText()
+    feeling: S.feeling, hasPain: S.hasPain, recentPain: S.recentPain,
+    level: S.level, types: [...S.types], dots: [...S.dots],
+    painStart: S.painStart, meds, summary: document.getElementById('summary-card').innerText
   };
-  const h = JSON.parse(localStorage.getItem('pain-history') || '[]');
+  const h = getHistory().filter(r => !r.isMock);
   h.unshift(record);
-  if (h.length > 50) h.length = 50;
-  localStorage.setItem('pain-history', JSON.stringify(h));
+  if (h.length > 100) h.length = 100;
+  const mock = getHistory().filter(r => r.isMock);
+  localStorage.setItem('pain-history', JSON.stringify([...h, ...mock]));
   startOver();
   alert('Saved! ✅');
 }
 
 function startOver() {
-  S.feeling = null; S.hasPain = true; S.dots = []; S.types = []; S.level = 0; S.med = '';
-  document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('selected'));
-  document.querySelectorAll('.pain-type-btn').forEach(b => b.classList.remove('selected'));
+  S.feeling=null; S.hasPain=true; S.recentPain=null; S.dots=[]; S.painStart=null;
+  S.types=[]; S.level=0; S.meds=[]; S.medOther=''; S.soundOn=false;
+  document.querySelectorAll('.emoji-btn,.pain-type-btn,.med-pill,.option-btn').forEach(b => b.classList.remove('selected'));
   clearDots();
-  const slider = document.getElementById('pain-slider');
-  slider.value = 0; updatePain(0);
-  document.getElementById('med-text').value = '';
-  document.getElementById('med-box').style.display = 'none';
-  document.getElementById('med-yes').style.display = 'block';
-  document.getElementById('med-no').style.display = 'block';
+  const sl = document.getElementById('pain-slider'); sl.value=0; updatePain(0);
+  document.getElementById('med-other-text').value='';
+  document.getElementById('med-other-wrap').style.display='none';
+  document.getElementById('sound-btn').textContent='🔇 Sound off';
+  document.getElementById('sound-btn').classList.remove('on');
+  if (gain) gain.gain.value=0;
   go('s-welcome');
 }
 
-function showHistory() {
-  const h = JSON.parse(localStorage.getItem('pain-history') || '[]');
+// ── HISTORY & GRAPH ──
+function getHistory() {
+  return JSON.parse(localStorage.getItem('pain-history') || '[]');
+}
+
+function buildHistory() {
+  const all = getHistory();
   const list = document.getElementById('history-list');
   list.innerHTML = '';
-  if (h.length === 0) {
-    list.innerHTML = '<p style="text-align:center;color:var(--muted);font-size:1.1rem;">No check-ins saved yet.</p>';
+
+  // Graph
+  const graphData = all.slice(0, 28).reverse();
+  document.getElementById('graph-svg').innerHTML = buildGraph(graphData);
+
+  // Baseline legend
+  const bl = getBaseline();
+  document.getElementById('baseline-legend').style.display = bl >= 0 ? 'flex' : 'none';
+
+  // List (real records only, most recent first)
+  const real = all.filter(r => !r.isMock);
+  if (real.length === 0) {
+    list.innerHTML = '<p class="subtitle">No real check-ins yet — complete a check-in to see it here.</p>';
   } else {
-    h.forEach(r => {
+    real.slice(0, 10).forEach(r => {
       const d = new Date(r.date);
-      const dateStr = d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})
-        + ' · ' + d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+      const dateStr = d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'}) + ' · ' + d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
       const col = r.hasPain ? painColor(r.level) : '#3aad6e';
       const num = r.hasPain ? r.level : '✓';
-      const sub = r.hasPain
-        ? `Pain ${r.level}/10${r.types.length ? ' · ' + r.types.join(', ') : ''}`
-        : 'No pain';
+      const sub = r.hasPain ? `Pain ${r.level}/10${r.types&&r.types.length?' · '+r.types.join(', '):''}` : 'No pain';
+      const medsStr = r.meds&&r.meds.length ? `Took: ${r.meds.join(', ')}` : '';
       const item = document.createElement('div');
       item.className = 'history-item';
-      item.innerHTML = `
-        <div class="history-circle" style="background:${col}">${num}</div>
+      item.innerHTML = `<div class="history-circle" style="background:${col}">${num}</div>
         <div class="history-info">
           <div class="date">${dateStr}</div>
           <div class="level">${sub}</div>
-          ${r.med ? `<div class="types">Took: ${r.med}</div>` : ''}
+          ${medsStr?`<div class="types">${medsStr}</div>`:''}
         </div>`;
       list.appendChild(item);
     });
   }
-  go('s-history');
 }
 
-// ── Speech ──
+function buildGraph(records) {
+  if (!records.length) return '';
+  const W=340, H=170, PL=28, PR=8, PT=16, PB=36;
+  const cW=W-PL-PR, cH=H-PT-PB;
+  const n=records.length, bW=Math.max(4, Math.floor(cW/n)-2);
+  const bl=getBaseline();
+  let svg=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">`;
+
+  // Grid lines
+  [0,2,4,6,8,10].forEach(i => {
+    const y=PT+cH-(i/10*cH);
+    svg+=`<line x1="${PL}" y1="${y}" x2="${W-PR}" y2="${y}" stroke="#f0ede8" stroke-width="1"/>`;
+    svg+=`<text x="${PL-4}" y="${y+4}" font-size="9" fill="#bbb" text-anchor="end">${i}</text>`;
+  });
+
+  // Baseline
+  if (bl>=0) {
+    const by=PT+cH-(bl/10*cH);
+    svg+=`<line x1="${PL}" y1="${by}" x2="${W-PR}" y2="${by}" stroke="#e8593a" stroke-width="1.5" stroke-dasharray="4,3" opacity=".55"/>`;
+  }
+
+  // Bars
+  records.forEach((r,i) => {
+    const x=PL+i*(cW/n);
+    const lvl=r.hasPain?(r.level||0):0;
+    const bH=Math.max(lvl>0?3:0, (lvl/10)*cH);
+    const y=PT+cH-bH;
+    const col=painColor(lvl);
+    const isToday=i===records.length-1;
+    svg+=`<rect x="${x+1}" y="${y}" width="${bW}" height="${bH}" rx="2" fill="${col}" opacity="${r.isMock?.45:1}"/>`;
+    if (isToday) svg+=`<rect x="${x}" y="${y-1}" width="${bW+2}" height="${bH+1}" rx="2" fill="none" stroke="#1a1a1a" stroke-width="1.5"/>`;
+    if (r.isPeriod) svg+=`<circle cx="${x+bW/2}" cy="${PT+cH+10}" r="4" fill="#e84393"/>`;
+    if (i===0||isToday||i%7===0) {
+      const d=new Date(r.date);
+      const lbl=isToday?'Today':`${d.getDate()}/${d.getMonth()+1}`;
+      svg+=`<text x="${x+bW/2}" y="${PT+cH+26}" font-size="8.5" fill="#bbb" text-anchor="middle">${lbl}</text>`;
+    }
+  });
+  svg+='</svg>';
+  return svg;
+}
+
+function buildMiniGraph(records) {
+  if (!records.length) return '';
+  const W=280, H=60, PL=0, PR=0, PT=4, PB=8;
+  const cW=W-PL-PR, cH=H-PT-PB;
+  const n=records.length, bW=Math.max(4,Math.floor(cW/n)-2);
+  let svg=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block">`;
+  records.forEach((r,i) => {
+    const x=PL+i*(cW/n);
+    const lvl=r.hasPain?(r.level||0):0;
+    const bH=Math.max(lvl>0?2:0,(lvl/10)*cH);
+    svg+=`<rect x="${x+1}" y="${PT+cH-bH}" width="${bW}" height="${bH}" rx="2" fill="${painColor(lvl)}" opacity="${r.isMock?.45:1}"/>`;
+  });
+  svg+='</svg>';
+  return svg;
+}
+
+// ── MOCK DATA SEED ──
+function seedMockData() {
+  if (localStorage.getItem('pain-seeded')) return;
+  const painPat=[4,5,3,4,6,7,5,4,3,2,4,5,6,7,6,5,4,3,2,3,4,5,6,7,6,5,4,3];
+  const typeOpts=[['Aching'],['Sharp','Aching'],['Dull'],['Throbbing'],['Aching','Tight'],['Burning']];
+  const medOpts=[['Paracetamol'],['Ibuprofen'],[],[],['Paracetamol'],[]];
+  const periodDays=[13,14,15,26,27];
+  const feelings=['good','ok','bad','ok','ok','good'];
+  const starts=['Today','A few days ago','About a week ago','Yesterday','A few days ago','A few weeks ago'];
+  const history=[];
+  for (let i=27;i>=0;i--) {
+    const d=new Date(); d.setDate(d.getDate()-(i+1));
+    const idx=27-i;
+    history.push({
+      date:d.toISOString(), isMock:true,
+      feeling:feelings[idx%feelings.length],
+      hasPain:painPat[idx]>0, level:painPat[idx],
+      types:typeOpts[idx%typeOpts.length],
+      dots:[{x:50,y:35}],
+      painStart:starts[idx%starts.length],
+      meds:medOpts[idx%medOpts.length],
+      isPeriod:periodDays.includes(idx)
+    });
+  }
+  localStorage.setItem('pain-history',JSON.stringify(history));
+  localStorage.setItem('pain-seeded','1');
+}
+
+// ── INFO MODAL ──
+function showInfo(title, body) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').textContent = body;
+  document.getElementById('info-modal').classList.add('open');
+}
+function closeInfo(e) { if (e.target === document.getElementById('info-modal')) closeModal(); }
+function closeModal() { document.getElementById('info-modal').classList.remove('open'); }
+
+// ── SPEECH ──
 function speak(text) {
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
@@ -639,8 +883,10 @@ function speak(text) {
   speechSynthesis.speak(u);
 }
 
-// ── Init ──
+// ── INIT ──
+seedMockData();
 updatePain(0);
+updateBaseline(0);
 drawProgress('s-welcome');
 </script>
 </body>
