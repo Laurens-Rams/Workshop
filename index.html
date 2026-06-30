@@ -3,78 +3,645 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>It's working!</title>
+<title>Pain Checker</title>
 <style>
-  :root {
-    --bg: #fff8ed;
-    --text: #2b2b2b;
-    --accent: #ff7a45;
-    --accent-dark: #d85f2c;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--bg);
-    color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-    padding: 24px;
-  }
-  main {
-    max-width: 480px;
-    width: 100%;
-    text-align: center;
-  }
-  h1 {
-    font-size: 2.4rem;
-    line-height: 1.2;
-    margin: 0 0 16px;
-  }
-  p {
-    font-size: 1.4rem;
-    line-height: 1.5;
-    margin: 0 0 32px;
-  }
-  button {
-    display: block;
-    width: 100%;
-    font-size: 1.4rem;
-    font-weight: 600;
-    padding: 20px;
-    margin-bottom: 16px;
-    border-radius: 16px;
-    border: none;
-    cursor: pointer;
-    background: var(--accent);
-    color: white;
-  }
-  button:active {
-    background: var(--accent-dark);
-  }
-  .emoji {
-    font-size: 3.5rem;
-    margin-bottom: 16px;
-  }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #faf9f6;
+  --card: #ffffff;
+  --text: #1a1a1a;
+  --muted: #777;
+  --accent: #e8593a;
+  --accent-dark: #c4452a;
+  --green: #3aad6e;
+  --radius: 18px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 16px 60px;
+}
+
+.screen {
+  display: none;
+  width: 100%;
+  max-width: 480px;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+.screen.active {
+  display: flex;
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+h1 { font-size: 2rem; line-height: 1.25; text-align: center; font-weight: 800; }
+h2 { font-size: 1.7rem; line-height: 1.3; text-align: center; font-weight: 700; }
+.subtitle { font-size: 1.15rem; color: var(--muted); text-align: center; line-height: 1.5; }
+
+/* Buttons */
+.btn {
+  display: block; width: 100%;
+  padding: 20px; font-size: 1.3rem; font-weight: 700;
+  border: none; border-radius: var(--radius);
+  cursor: pointer; text-align: center;
+  background: var(--accent); color: white;
+  transition: background 0.15s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn:active { transform: scale(0.97); background: var(--accent-dark); }
+.btn.secondary { background: #ebe8e2; color: var(--text); }
+.btn.secondary:active { background: #d9d5ce; }
+.btn.green { background: var(--green); }
+.btn.green:active { background: #2d9159; }
+.btn.outline { background: transparent; color: var(--accent); border: 2.5px solid var(--accent); }
+
+/* Back button */
+.back-btn {
+  align-self: flex-start;
+  background: none; border: none;
+  color: var(--muted); font-size: 1rem;
+  cursor: pointer; padding: 4px 0;
+}
+
+/* Progress dots */
+.progress { display: flex; gap: 8px; }
+.progress-dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: #ddd; transition: background 0.2s;
+}
+.progress-dot.done { background: var(--accent); }
+
+/* Emoji row */
+.emoji-row { display: flex; gap: 10px; width: 100%; }
+.emoji-btn {
+  flex: 1; padding: 22px 8px;
+  border: 3px solid #e5e2dc; border-radius: var(--radius);
+  background: white; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  font-size: 2.2rem;
+  transition: border-color 0.15s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+}
+.emoji-btn .label { font-size: 1rem; font-weight: 700; color: var(--text); }
+.emoji-btn.selected { border-color: var(--accent); background: #fff3f0; }
+.emoji-btn:active { transform: scale(0.95); }
+
+/* Body map */
+.body-map-wrap {
+  position: relative;
+  width: 180px; height: 300px;
+  cursor: crosshair;
+  touch-action: none;
+  user-select: none;
+}
+.body-map-wrap svg { width: 100%; height: 100%; }
+.pain-dot {
+  position: absolute;
+  width: 24px; height: 24px;
+  background: var(--accent);
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 2px 10px rgba(232,89,58,0.5);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  animation: popIn 0.2s ease;
+}
+@keyframes popIn {
+  from { transform: translate(-50%,-50%) scale(0); }
+  to   { transform: translate(-50%,-50%) scale(1); }
+}
+
+/* Pain type grid */
+.pain-types { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
+.pain-type-btn {
+  padding: 18px 8px;
+  border: 3px solid #e5e2dc; border-radius: var(--radius);
+  background: white; font-size: 1.05rem; font-weight: 700;
+  cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  transition: border-color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.pain-type-btn .icon { font-size: 1.9rem; }
+.pain-type-btn.selected { border-color: var(--accent); background: #fff3f0; }
+.pain-type-btn:active { transform: scale(0.96); }
+
+/* Pain circle + slider */
+.pain-circle-wrap { display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%; }
+.pain-circle {
+  width: 170px; height: 170px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: #a8d8ea;
+  transition: background 0.25s, box-shadow 0.25s;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.15);
+}
+.pain-circle-num { font-size: 3.5rem; font-weight: 900; color: white; text-shadow: 0 2px 8px rgba(0,0,0,0.25); }
+.pain-slider {
+  width: 100%; height: 10px;
+  -webkit-appearance: none; border-radius: 10px;
+  background: linear-gradient(to right, #a8d8ea, #ffb347, #ff2d2d);
+  outline: none; cursor: pointer;
+}
+.pain-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 40px; height: 40px; border-radius: 50%;
+  background: white; border: 3px solid #ccc;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  cursor: pointer;
+}
+.pain-labels { display: flex; justify-content: space-between; width: 100%; }
+.pain-labels span { font-size: 0.95rem; color: var(--muted); }
+
+.sound-toggle {
+  background: none; border: 2px solid #ddd;
+  border-radius: 30px; padding: 12px 22px;
+  font-size: 1rem; cursor: pointer; color: var(--muted);
+  display: flex; align-items: center; gap: 8px;
+  transition: border-color 0.15s, color 0.15s;
+}
+.sound-toggle.on { border-color: var(--accent); color: var(--accent); }
+
+/* Medication */
+.med-textarea {
+  width: 100%; font-size: 1.15rem; font-family: inherit;
+  padding: 18px; border: 2.5px solid #e5e2dc;
+  border-radius: var(--radius); background: white; outline: none;
+  resize: none; line-height: 1.5;
+}
+.med-textarea:focus { border-color: var(--accent); }
+
+/* Summary */
+.summary-card {
+  width: 100%; background: white;
+  border-radius: var(--radius); padding: 24px;
+  font-size: 1.15rem; line-height: 1.8;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+}
+.summary-card strong { color: var(--accent); }
+
+/* Read aloud button */
+.read-btn {
+  background: none; border: 2px solid #ddd;
+  border-radius: 30px; padding: 12px 22px;
+  font-size: 1rem; cursor: pointer; color: var(--muted);
+  display: flex; align-items: center; gap: 8px;
+}
+.read-btn:active { background: #f0ede8; }
+
+/* History */
+.history-list { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+.history-item {
+  background: white; border-radius: 14px; padding: 16px 18px;
+  display: flex; align-items: center; gap: 16px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+}
+.history-circle {
+  width: 52px; height: 52px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; font-weight: 900; color: white;
+}
+.history-info { flex: 1; }
+.history-info .date { font-size: 0.9rem; color: var(--muted); }
+.history-info .level { font-size: 1.15rem; font-weight: 700; }
+.history-info .types { font-size: 0.95rem; color: var(--muted); }
+
+/* App header */
+.app-logo { font-size: 3rem; }
+.app-name { font-size: 2.2rem; font-weight: 900; }
+.app-tagline { font-size: 1.15rem; color: var(--muted); text-align: center; }
 </style>
 </head>
 <body>
-<main>
-  <div class="emoji">✅</div>
-  <h1>It's working!</h1>
-  <p>You opened the test page on your phone. Thank you for helping us build this.</p>
-  <button onclick="readAloud()">🔊 Read it out loud</button>
-</main>
+
+<!-- ── WELCOME ── -->
+<div class="screen active" id="s-welcome">
+  <div style="height:20px"></div>
+  <div class="app-logo">🩺</div>
+  <div class="app-name">Pain Checker</div>
+  <div class="app-tagline">Help yourself explain how you feel</div>
+  <div style="height:8px"></div>
+  <button class="btn" onclick="go('s-feeling')">Start a check-in</button>
+  <button class="btn secondary" onclick="showHistory()">See past check-ins</button>
+  <button class="read-btn" onclick="speak('Pain Checker. Help yourself explain how you feel. Tap Start a check-in to begin.')">🔊 Read out loud</button>
+</div>
+
+<!-- ── HOW ARE YOU FEELING ── -->
+<div class="screen" id="s-feeling">
+  <button class="back-btn" onclick="go('s-welcome')">← Back</button>
+  <div class="progress" id="prog-feeling"></div>
+  <h1>How are you feeling right now?</h1>
+  <div class="emoji-row">
+    <button class="emoji-btn" onclick="pickFeeling('good',this)">😊<span class="label">Good</span></button>
+    <button class="emoji-btn" onclick="pickFeeling('ok',this)">😐<span class="label">OK</span></button>
+    <button class="emoji-btn" onclick="pickFeeling('bad',this)">😣<span class="label">Not great</span></button>
+  </div>
+  <button class="read-btn" onclick="speak('How are you feeling right now? Choose Good, OK, or Not great.')">🔊 Read out loud</button>
+</div>
+
+<!-- ── DO YOU HAVE PAIN ── -->
+<div class="screen" id="s-haspain">
+  <button class="back-btn" onclick="go('s-feeling')">← Back</button>
+  <div class="progress" id="prog-haspain"></div>
+  <h1>Do you have any pain right now?</h1>
+  <button class="btn" onclick="pickHasPain(true)">Yes, I have pain</button>
+  <button class="btn secondary" onclick="pickHasPain(false)">No pain right now</button>
+  <button class="read-btn" onclick="speak('Do you have any pain right now?')">🔊 Read out loud</button>
+</div>
+
+<!-- ── BODY MAP ── -->
+<div class="screen" id="s-bodymap">
+  <button class="back-btn" onclick="go('s-haspain')">← Back</button>
+  <div class="progress" id="prog-bodymap"></div>
+  <h2>Tap where it hurts</h2>
+  <p class="subtitle">You can tap more than one place</p>
+  <div class="body-map-wrap" id="body-map"
+       ontouchstart="bodyTap(event)" onclick="bodyTap(event)">
+    <svg viewBox="0 0 200 320" xmlns="http://www.w3.org/2000/svg">
+      <!-- Head -->
+      <ellipse cx="100" cy="38" rx="28" ry="32" fill="#ddd4c8" stroke="#c5bcb2" stroke-width="2"/>
+      <!-- Neck -->
+      <rect x="90" y="68" width="20" height="14" rx="4" fill="#ddd4c8" stroke="#c5bcb2" stroke-width="2"/>
+      <!-- Torso -->
+      <rect x="62" y="81" width="76" height="92" rx="14" fill="#ddd4c8" stroke="#c5bcb2" stroke-width="2"/>
+      <!-- Left upper arm -->
+      <rect x="36" y="83" width="24" height="60" rx="12" fill="#ddd4c8" stroke="#c5bcb2" stroke-width="2"/>
+      <!-- Right upper arm -->
+      <rect x="140" y="83" width="24" height="60" rx="12" fill="#ddd4c8" stroke="#c5bcb2" stroke-width="2"/>
+      <!-- Left forearm -->
+      <rect x="38" y="144" width="20" height="52" rx="10" fill="#ddd4c8" stroke="#c5bcb2" stroke-width="2"/>
+      <!-- Right forearm -->
+      <rect x="142" y="144" width="20" height="52" rx="10" fill="#ddd4c8" stroke="#c5bcb2" stroke-width="2"/>
+      <!-- Left hand -->
+      <ellipse cx="48" cy="204" rx="12" ry="14" fill="#ddd4c8" stroke="#c5bcb2" stroke-width="2"/>
+      <!-- Right hand -->
+      <ellipse cx="152" cy="204" rx="12" ry="14" fill="#ddd4c8" stroke="#c5bcb2" stroke-width="2"/>
+      <!-- Left leg -->
+      <rect x="66" y="172" width="30" height="88" rx="13" fill="#ddd4c8" stroke="#c5bcb2" stroke-width="2"/>
+      <!-- Right leg -->
+      <rect x="104" y="172" width="30" height="88" rx="13" fill="#ddd4c8" stroke="#c5bcb2" stroke-width="2"/>
+      <!-- Left foot -->
+      <ellipse cx="81" cy="266" rx="16" ry="11" fill="#ddd4c8" stroke="#c5bcb2" stroke-width="2"/>
+      <!-- Right foot -->
+      <ellipse cx="119" cy="266" rx="16" ry="11" fill="#ddd4c8" stroke="#c5bcb2" stroke-width="2"/>
+      <!-- Eyes -->
+      <circle cx="91" cy="34" r="3" fill="#b0a898"/>
+      <circle cx="109" cy="34" r="3" fill="#b0a898"/>
+      <!-- Smile -->
+      <path d="M93 46 Q100 52 107 46" fill="none" stroke="#b0a898" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <button class="btn" onclick="go('s-paintype')">Next →</button>
+  <button class="btn outline" onclick="clearDots()" style="font-size:1.1rem; padding:16px;">Clear all</button>
+  <button class="read-btn" onclick="speak('Tap on the body to show where you feel pain. You can tap more than one place. Then tap Next.')">🔊 Read out loud</button>
+</div>
+
+<!-- ── PAIN TYPE ── -->
+<div class="screen" id="s-paintype">
+  <button class="back-btn" onclick="go('s-bodymap')">← Back</button>
+  <div class="progress" id="prog-paintype"></div>
+  <h2>What does your pain feel like?</h2>
+  <p class="subtitle">Pick as many as you like</p>
+  <div class="pain-types">
+    <button class="pain-type-btn" onclick="toggleType('Sharp',this)"><span class="icon">⚡</span>Sharp</button>
+    <button class="pain-type-btn" onclick="toggleType('Dull',this)"><span class="icon">🌑</span>Dull</button>
+    <button class="pain-type-btn" onclick="toggleType('Burning',this)"><span class="icon">🔥</span>Burning</button>
+    <button class="pain-type-btn" onclick="toggleType('Aching',this)"><span class="icon">💢</span>Aching</button>
+    <button class="pain-type-btn" onclick="toggleType('Throbbing',this)"><span class="icon">💓</span>Throbbing</button>
+    <button class="pain-type-btn" onclick="toggleType('Stabbing',this)"><span class="icon">🗡️</span>Stabbing</button>
+    <button class="pain-type-btn" onclick="toggleType('Tight',this)"><span class="icon">🤜</span>Tight</button>
+    <button class="pain-type-btn" onclick="toggleType('Shooting',this)"><span class="icon">➡️</span>Shooting</button>
+  </div>
+  <button class="btn" onclick="go('s-painlevel')">Next →</button>
+  <button class="read-btn" onclick="speak('What does your pain feel like? You can pick more than one.')">🔊 Read out loud</button>
+</div>
+
+<!-- ── PAIN LEVEL ── -->
+<div class="screen" id="s-painlevel">
+  <button class="back-btn" onclick="go('s-paintype')">← Back</button>
+  <div class="progress" id="prog-painlevel"></div>
+  <h2>How bad is the pain?</h2>
+  <div class="pain-circle-wrap">
+    <div class="pain-circle" id="pain-circle">
+      <span class="pain-circle-num" id="pain-num">0</span>
+    </div>
+    <input type="range" min="0" max="10" value="0" class="pain-slider" id="pain-slider"
+           oninput="updatePain(this.value)" onchange="updatePain(this.value)">
+    <div class="pain-labels">
+      <span>0 — No pain</span>
+      <span>10 — Worst pain</span>
+    </div>
+    <button class="sound-toggle" id="sound-btn" onclick="toggleSound()">🔇 Sound off</button>
+  </div>
+  <button class="btn" onclick="go('s-medication')">Next →</button>
+  <button class="read-btn" onclick="speak('Move the slider to show how bad your pain is. 0 means no pain. 10 means the worst pain you can imagine.')">🔊 Read out loud</button>
+</div>
+
+<!-- ── MEDICATION ── -->
+<div class="screen" id="s-medication">
+  <button class="back-btn" onclick="go('s-painlevel')">← Back</button>
+  <div class="progress" id="prog-medication"></div>
+  <h2>Did you take anything for the pain?</h2>
+  <p class="subtitle">Like medicine, tablets, or anything else</p>
+  <button class="btn" id="med-yes" onclick="showMedBox()">Yes</button>
+  <button class="btn secondary" id="med-no" onclick="skipMed()">No, nothing</button>
+  <div id="med-box" style="display:none; width:100%; display:none;">
+    <textarea class="med-textarea" id="med-text" rows="3" placeholder="e.g. Paracetamol, ibuprofen…"></textarea>
+    <div style="height:8px"></div>
+    <button class="btn green" onclick="saveMed()">Done →</button>
+  </div>
+  <button class="read-btn" onclick="speak('Did you take any medicine or tablets for the pain?')">🔊 Read out loud</button>
+</div>
+
+<!-- ── SUMMARY ── -->
+<div class="screen" id="s-summary">
+  <button class="back-btn" onclick="go('s-medication')">← Back</button>
+  <h2>Here's what you can tell your doctor</h2>
+  <div class="summary-card" id="summary-card"></div>
+  <button class="read-btn" onclick="readSummary()" style="font-size:1.1rem; padding:16px 26px; align-self:stretch; justify-content:center; border-radius:var(--radius);">
+    🔊 Read it all out loud
+  </button>
+  <button class="btn green" onclick="saveCheckin()">Save this check-in</button>
+  <button class="btn secondary" onclick="startOver()">Start a new check-in</button>
+</div>
+
+<!-- ── HISTORY ── -->
+<div class="screen" id="s-history">
+  <button class="back-btn" onclick="go('s-welcome')">← Back</button>
+  <h2>Your past check-ins</h2>
+  <div class="history-list" id="history-list"></div>
+  <button class="btn secondary" onclick="go('s-welcome')">Back to start</button>
+</div>
+
 <script>
-function readAloud() {
-  const text = "It's working! You opened the test page on your phone. Thank you for helping us build this.";
-  const utter = new SpeechSynthesisUtterance(text);
-  utter.rate = 0.9;
-  speechSynthesis.cancel();
-  speechSynthesis.speak(utter);
+// ── State ──
+const S = {
+  feeling: null,
+  hasPain: true,
+  dots: [],
+  types: [],
+  level: 0,
+  med: '',
+  soundOn: false
+};
+
+// ── Audio ──
+let actx, osc, gain;
+
+function initAudio() {
+  if (actx) return;
+  actx = new (window.AudioContext || window.webkitAudioContext)();
+  gain = actx.createGain();
+  gain.connect(actx.destination);
+  gain.gain.value = 0;
+  osc = actx.createOscillator();
+  osc.type = 'sine';
+  osc.connect(gain);
+  osc.start();
 }
+
+function toggleSound() {
+  S.soundOn = !S.soundOn;
+  const btn = document.getElementById('sound-btn');
+  if (S.soundOn) {
+    btn.textContent = '🔊 Sound on';
+    btn.classList.add('on');
+    initAudio();
+    applySound(S.level);
+  } else {
+    btn.textContent = '🔇 Sound off';
+    btn.classList.remove('on');
+    if (gain) gain.gain.value = 0;
+  }
+}
+
+function applySound(level) {
+  if (!S.soundOn || !gain) return;
+  gain.gain.value = level === 0 ? 0 : 0.04 + (level / 10) * 0.28;
+  if (osc) osc.frequency.value = 90 + (level / 10) * 320;
+}
+
+// ── Pain colour ──
+function painColor(level) {
+  if (level === 0) return '#a8d8ea';
+  if (level <= 5) {
+    const t = level / 5;
+    return `rgb(${Math.round(168 + 87*t)}, ${Math.round(216 - 96*t)}, ${Math.round(234 - 234*t)})`;
+  }
+  const t = (level - 5) / 5;
+  return `rgb(255, ${Math.round(120 - 120*t)}, 0)`;
+}
+
+function updatePain(val) {
+  S.level = +val;
+  const c = document.getElementById('pain-circle');
+  c.style.background = painColor(S.level);
+  c.style.boxShadow = S.level > 0
+    ? `0 6px 30px ${painColor(S.level)}80`
+    : '0 6px 24px rgba(0,0,0,0.1)';
+  document.getElementById('pain-num').textContent = S.level;
+  applySound(S.level);
+}
+
+// ── Navigation ──
+const FLOW = ['s-feeling','s-haspain','s-bodymap','s-paintype','s-painlevel','s-medication','s-summary'];
+
+function go(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  drawProgress(id);
+  if (id === 's-summary') buildSummary();
+}
+
+function drawProgress(active) {
+  FLOW.forEach((id, i) => {
+    const el = document.getElementById('prog-' + id.replace('s-',''));
+    if (!el) return;
+    el.innerHTML = '';
+    const activeIdx = FLOW.indexOf(active);
+    FLOW.slice(0, FLOW.length-1).forEach((_, j) => {
+      const d = document.createElement('div');
+      d.className = 'progress-dot' + (j < activeIdx ? ' done' : '');
+      el.appendChild(d);
+    });
+  });
+}
+
+// ── Screen logic ──
+function pickFeeling(val, btn) {
+  S.feeling = val;
+  document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  setTimeout(() => go('s-haspain'), 280);
+}
+
+function pickHasPain(val) {
+  S.hasPain = val;
+  if (val) { go('s-bodymap'); }
+  else { S.dots=[]; S.types=[]; S.level=0; S.med=''; go('s-summary'); }
+}
+
+function bodyTap(e) {
+  e.preventDefault();
+  const map = document.getElementById('body-map');
+  const rect = map.getBoundingClientRect();
+  let cx, cy;
+  if (e.touches && e.touches.length) {
+    cx = e.touches[0].clientX; cy = e.touches[0].clientY;
+  } else {
+    cx = e.clientX; cy = e.clientY;
+  }
+  const x = ((cx - rect.left) / rect.width * 100);
+  const y = ((cy - rect.top) / rect.height * 100);
+  S.dots.push({x, y});
+  const dot = document.createElement('div');
+  dot.className = 'pain-dot';
+  dot.style.left = x + '%';
+  dot.style.top = y + '%';
+  map.appendChild(dot);
+}
+
+function clearDots() {
+  S.dots = [];
+  document.querySelectorAll('.pain-dot').forEach(d => d.remove());
+}
+
+function toggleType(type, btn) {
+  btn.classList.toggle('selected');
+  const i = S.types.indexOf(type);
+  if (i === -1) S.types.push(type); else S.types.splice(i, 1);
+}
+
+function showMedBox() {
+  document.getElementById('med-yes').style.display = 'none';
+  document.getElementById('med-no').style.display = 'none';
+  document.getElementById('med-box').style.display = 'block';
+  document.getElementById('med-text').focus();
+}
+
+function skipMed() {
+  S.med = '';
+  go('s-summary');
+}
+
+function saveMed() {
+  S.med = document.getElementById('med-text').value.trim();
+  go('s-summary');
+}
+
+// ── Summary ──
+function buildSummary() {
+  const feelLabel = {good:'good 😊', ok:'OK 😐', bad:'not great 😣'};
+  let lines = [];
+  if (S.feeling) lines.push(`I'm feeling <strong>${feelLabel[S.feeling]}</strong> today.`);
+  if (!S.hasPain) {
+    lines.push(`I don't have any pain right now.`);
+  } else {
+    if (S.dots.length > 0)
+      lines.push(`I have pain in <strong>${S.dots.length === 1 ? '1 place' : S.dots.length + ' places'}</strong> on my body.`);
+    if (S.types.length > 0)
+      lines.push(`The pain feels <strong>${S.types.join(', ')}</strong>.`);
+    lines.push(`My pain level is <strong>${S.level} out of 10</strong>.`);
+    if (S.med) lines.push(`I took <strong>${S.med}</strong> for the pain.`);
+    else lines.push(`I haven't taken anything for it.`);
+  }
+  document.getElementById('summary-card').innerHTML = lines.join('<br><br>');
+}
+
+function summaryPlainText() {
+  return document.getElementById('summary-card').innerText;
+}
+
+function readSummary() { speak(summaryPlainText()); }
+
+function saveCheckin() {
+  const record = {
+    date: new Date().toISOString(),
+    feeling: S.feeling,
+    hasPain: S.hasPain,
+    level: S.level,
+    types: [...S.types],
+    dots: [...S.dots],
+    med: S.med,
+    summary: summaryPlainText()
+  };
+  const h = JSON.parse(localStorage.getItem('pain-history') || '[]');
+  h.unshift(record);
+  if (h.length > 50) h.length = 50;
+  localStorage.setItem('pain-history', JSON.stringify(h));
+  startOver();
+  alert('Saved! ✅');
+}
+
+function startOver() {
+  S.feeling = null; S.hasPain = true; S.dots = []; S.types = []; S.level = 0; S.med = '';
+  document.querySelectorAll('.emoji-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelectorAll('.pain-type-btn').forEach(b => b.classList.remove('selected'));
+  clearDots();
+  const slider = document.getElementById('pain-slider');
+  slider.value = 0; updatePain(0);
+  document.getElementById('med-text').value = '';
+  document.getElementById('med-box').style.display = 'none';
+  document.getElementById('med-yes').style.display = 'block';
+  document.getElementById('med-no').style.display = 'block';
+  go('s-welcome');
+}
+
+function showHistory() {
+  const h = JSON.parse(localStorage.getItem('pain-history') || '[]');
+  const list = document.getElementById('history-list');
+  list.innerHTML = '';
+  if (h.length === 0) {
+    list.innerHTML = '<p style="text-align:center;color:var(--muted);font-size:1.1rem;">No check-ins saved yet.</p>';
+  } else {
+    h.forEach(r => {
+      const d = new Date(r.date);
+      const dateStr = d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})
+        + ' · ' + d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+      const col = r.hasPain ? painColor(r.level) : '#3aad6e';
+      const num = r.hasPain ? r.level : '✓';
+      const sub = r.hasPain
+        ? `Pain ${r.level}/10${r.types.length ? ' · ' + r.types.join(', ') : ''}`
+        : 'No pain';
+      const item = document.createElement('div');
+      item.className = 'history-item';
+      item.innerHTML = `
+        <div class="history-circle" style="background:${col}">${num}</div>
+        <div class="history-info">
+          <div class="date">${dateStr}</div>
+          <div class="level">${sub}</div>
+          ${r.med ? `<div class="types">Took: ${r.med}</div>` : ''}
+        </div>`;
+      list.appendChild(item);
+    });
+  }
+  go('s-history');
+}
+
+// ── Speech ──
+function speak(text) {
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate = 0.88; u.lang = 'en-GB';
+  speechSynthesis.speak(u);
+}
+
+// ── Init ──
+updatePain(0);
+drawProgress('s-welcome');
 </script>
 </body>
 </html>
